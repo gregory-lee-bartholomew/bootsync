@@ -1,0 +1,13 @@
+[Unit]
+Description=bind mount currently-booted ESP to /boot
+ConditionFileIsExecutable=/etc/rc.d/rc.bootbind
+After=local-fs.target
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.d/rc.bootbind
+RemainAfterExit=yes
+GuessMainPID=no
+
+[Install]
+WantedBy=multi-user.target

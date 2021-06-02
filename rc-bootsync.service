@@ -1,0 +1,15 @@
+[Unit]
+Description=synchronize ESPs on mirrored-disk systems
+ConditionFileIsExecutable=/etc/rc.d/rc.bootsync
+AssertPathIsMountPoint=/boot
+After=local-fs.target
+After=rc-bootbind.service
+
+[Service]
+Type=forking
+ExecStart=/etc/rc.d/rc.bootsync
+RemainAfterExit=yes
+GuessMainPID=no
+
+[Install]
+WantedBy=multi-user.target

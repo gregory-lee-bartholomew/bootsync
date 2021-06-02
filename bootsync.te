@@ -1,0 +1,15 @@
+module bootsync 1.0;
+
+require {
+	type rsync_t;
+	type boot_t;
+	class lnk_file read;
+	class dir { add_name create getattr open read remove_name rmdir search write };
+	class file { create getattr open read rename setattr unlink write };
+}
+
+#============= rsync_t ==============
+
+allow rsync_t boot_t:lnk_file read;
+allow rsync_t boot_t:dir { add_name create getattr open read remove_name rmdir search write };
+allow rsync_t boot_t:file { create getattr open read rename setattr unlink write };

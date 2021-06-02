@@ -1,0 +1,47 @@
+#!/usr/bin/bash
+# vim:set ts=3:
+
+set -e
+
+shopt -s lastpipe
+
+if ! mountpoint -q /boot; then
+	echo "/boot is not a mountpoint, aborting..." 1>&2
+	exit 1
+fi
+
+if ! [[ -d /boot/loader ]]; then
+	echo "directory /boot/loader not found, aborting..." 1>&2
+	exit 1
+fi
+
+read MACHINE_ID < /etc/machine-id
+if [[ -z $MACHINE_ID ]]; then
+	echo "file /etc/machine-id is empty, aborting..." 1>&2
+	exit 1
+fi
+
+ls -v /lib/modules | tail -n 1 | read LASTKRN
+if ! [[ -e /boot/$MACHINE_ID/$LASTKRN ]]; then
+   echo "$MACHINE_ID/$LASTKRN not found under /boot, aborting..." 1>&2
+   exit 1
+fi
+
+findmnt -n -l --output source /boot | read SOURCE
+findmnt -n -l --output target $SOURCE | grep -m 1 "^/boot@[a-z]$" | read TGT
+if [[ -z $TGT ]]; then
+	echo "/boot does not appear to be a bind mount of /boot@[a-z], aborting..." 1>&2
+	exit 1
+fi
+
+if [[ -t 1 ]]; then
+	VERBOSITY='-v'
+else
+	VERBOSITY='-q'
+fi
+
+for m in $(ls -d /boot@[a-z]); do
+	mountpoint -q $m || continue
+	[[ $m == $TGT ]] && continue
+	rsync $VERBOSITY -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" /boot/ $m
+done

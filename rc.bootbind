@@ -1,0 +1,54 @@
+#!/usr/bin/bash
+# vim:set ts=3:
+
+set -e
+
+shopt -s dotglob
+shopt -s lastpipe
+
+# cleanup /boot symlink from early versions of this script
+if [[ -h /boot ]]; then
+	chmod -x /etc/rc.d/rc.bootlink || true
+	rm -f /boot
+fi
+
+if mountpoint -q /boot; then
+	echo "/boot is already mounted, aborting..." 1>&2
+	exit 1
+fi
+
+if ls /boot/* &> /dev/null; then
+	echo "/boot is not empty, aborting..." 1>&2
+	exit 1
+fi
+
+DATA="$(efibootmgr -v)"
+if [[ -z $DATA ]]; then
+	echo "failed to read efi variables, aborting..." 1>&2
+	exit 1
+fi
+
+echo "$DATA" | grep "^BootCurrent: " | read BOOT
+if [[ -z $BOOT ]]; then
+	echo "failed to determine current esp, aborting..." 1>&2
+	exit 1
+fi
+
+echo "$DATA" | grep "^Boot${BOOT#BootCurrent: }" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
+if [[ -z $UUID ]]; then
+	echo "failed to find current esp's partition uuid, aborting..." 1>&2
+	exit 1
+fi
+
+findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep -m 1 "^/boot@[a-z]$" | read TRGT
+if [[ -z $TRGT ]]; then
+	echo "failed to find mountpoint of form /boot@[a-z] for current esp, aborting..." 1>&2
+	exit 1
+fi
+
+mkdir -p /boot
+
+chmod 0000 /boot &> /dev/null || true
+chcon -u system_u -r object_r -t boot_t -l s0 /boot &> /dev/null || true
+
+mount -o bind $TRGT /boot
