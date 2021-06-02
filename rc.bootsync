@@ -27,8 +27,8 @@ fi
 
 ls -v /lib/modules | tail -n 1 | read LASTKRN
 if ! [[ -e /boot/$MACHINE_ID/$LASTKRN ]]; then
-   echo "$MACHINE_ID/$LASTKRN not found under /boot, aborting..." 1>&2
-   exit 1
+	echo "$MACHINE_ID/$LASTKRN not found under /boot, aborting..." 1>&2
+	exit 1
 fi
 
 findmnt -n -l --output source /boot | read SRC
@@ -54,9 +54,9 @@ for m in $(ls -d /boot@[a-z]); do
 	touch $TEMPDIR/$LASTESP
 	ls -v $TEMPDIR | tail -n 1 | read TESTKRN
 	if [[ $TESTKRN != $LASTKRN ]]; then
-	   echo "newer kernel detected on $m, refusing to update..." 1>&2
-	   rm $TEMPDIR/$LASTESP
-	   continue
+		echo "newer kernel detected on $m, refusing to update..." 1>&2
+		rm $TEMPDIR/$LASTESP
+		continue
 	fi
 
 	rsync $VERBOSITY -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" /boot/ $m
