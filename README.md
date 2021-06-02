@@ -18,7 +18,7 @@ Keep ESPs synchronized on mirrored-disk systems
 
 # About
 
-This is a rewrite of a previous version of this software by the same name. The previous version made /boot a symlink and the mountpoints for the ESPs were of the form /boot.[a-z]. This version uses a bind mount for /boot instead of the symlink and the mountpoints for the ESPs are expected to be of the form /boot@[a-z]. If you used the previous version, reconfiguring the mountpoints to use the new form and running *sudo make install* should be sufficient to upgrade.
+This is a rewrite of a previous version of this software by the same name. The previous version made /boot a symlink and the mountpoints for the ESPs were of the form /boot.[a-z]. This version uses a bind mount for /boot instead of the symlink and the mountpoints for the ESPs are expected to be of the form /boot@[a-z]. If you used the previous version, reconfiguring the mountpoints to use the new form and running `sudo make install` should be sufficient to upgrade.
 
 # Installation
 
