@@ -12,7 +12,7 @@ Keep ESPs synchronized on mirrored-disk systems
 - systemd
 - efibootmgr
 - rsync
-- coreutils (ln)
+- coreutils (ln, mktemp)
 - util-linux (mountpoint, findmnt)
 - selinux-policy-devel (needed by sepolicy\_install)
 

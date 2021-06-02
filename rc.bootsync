@@ -5,6 +5,10 @@ set -e
 
 shopt -s lastpipe
 
+TEMPDIR=''
+function cleanup { [[ -n "$TEMPDIR" ]] && rm -rf $TEMPDIR; }
+trap cleanup exit
+
 if ! mountpoint -q /boot; then
 	echo "/boot is not a mountpoint, aborting..." 1>&2
 	exit 1
@@ -27,8 +31,8 @@ if ! [[ -e /boot/$MACHINE_ID/$LASTKRN ]]; then
    exit 1
 fi
 
-findmnt -n -l --output source /boot | read SOURCE
-findmnt -n -l --output target $SOURCE | grep -m 1 "^/boot@[a-z]$" | read TGT
+findmnt -n -l --output source /boot | read SRC
+findmnt -n -l --output target $SRC | grep -m 1 "^/boot@[a-z]$" | read TGT
 if [[ -z $TGT ]]; then
 	echo "/boot does not appear to be a bind mount of /boot@[a-z], aborting..." 1>&2
 	exit 1
@@ -40,8 +44,20 @@ else
 	VERBOSITY='-q'
 fi
 
+mktemp -d | read TEMPDIR
+touch $TEMPDIR/$LASTKRN
 for m in $(ls -d /boot@[a-z]); do
 	mountpoint -q $m || continue
 	[[ $m == $TGT ]] && continue
+
+	ls -v $m/$MACHINE_ID | tail -n 1 | read LASTESP
+	touch $TEMPDIR/$LASTESP
+	ls -v $TEMPDIR | tail -n 1 | read TESTKRN
+	if [[ $TESTKRN != $LASTKRN ]]; then
+	   echo "newer kernel detected on $m, refusing to update..." 1>&2
+	   rm $TEMPDIR/$LASTESP
+	   continue
+	fi
+
 	rsync $VERBOSITY -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" /boot/ $m
 done
