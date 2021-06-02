@@ -44,7 +44,7 @@ install : test $(sysv_scripts) $(sysd_scripts) rmold
 sepolicy : $(sepolicypkgs)
 
 sepolicy_install : sepolicy
-	semodule -v -i $(sepolicypkgs)
+	semodule -i $(sepolicypkgs)
 	semanage fcontext -a $(se_fcontexts)
 
 uninstall : test
