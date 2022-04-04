@@ -2,6 +2,7 @@
 Description=bind mount currently-booted ESP to /boot
 ConditionFileIsExecutable=/etc/rc.d/rc.bootbind
 After=local-fs.target
+Before=system-update-pre.target
 
 [Service]
 Type=forking
