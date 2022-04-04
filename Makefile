@@ -13,18 +13,11 @@ errormessage := "access denied, (missing sudo?)"
 all :
 	echo "usage: make <install|sepolicy_install|uninstall>"
 
-rmold :
-	test -h /boot && rm -f /boot || true
-	rm -f /etc/rc.d/rc.bootlink
-	rm -f /etc/systemd/system/rc-bootlink.service
-	semanage fcontext -d -t boot_t "/boot\.[a-z](/.*)?" &> /dev/null || \
-	true
-
 test : $(sysv_install) $(sysd_install)
 	test -w $(sysv_install) || (echo $(errormessage) 1>&2; exit 1)
 	test -w $(sysd_install) || (echo $(errormessage) 1>&2; exit 1)
 
-install : test $(sysv_scripts) $(sysd_scripts) rmold
+install : test $(sysv_scripts) $(sysd_scripts)
 	for i in $(sysv_scripts); do \
 		cp -vf $$i $(sysv_install)/$$i; \
 		chmod -v +x $(sysv_install)/$$i || true; \
@@ -55,7 +48,7 @@ uninstall : test
 	xargs -r -n 1 semodule -v -r || true
 	semanage fcontext -d $(se_fcontexts) || true
 
-.PHONY : all rmold test install sepolicy sepolicy_install uninstall
+.PHONY : all test install sepolicy sepolicy_install uninstall
 
 .SILENT :
 
