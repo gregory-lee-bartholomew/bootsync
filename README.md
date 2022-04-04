@@ -16,10 +16,6 @@ Keep ESPs synchronized on mirrored-disk systems
 - util-linux (mountpoint, findmnt)
 - selinux-policy-devel (needed by sepolicy\_install)
 
-# About
-
-This is a rewrite of a previous version of this software by the same name. The previous version made /boot a symlink and the mountpoints for the ESPs were of the form /boot.[a-z]. This version uses a bind mount for /boot instead of the symlink and the mountpoints for the ESPs are expected to be of the form /boot@[a-z]. If you used the previous version, reconfiguring the mountpoints to use the new form and running `sudo make install` should be sufficient to upgrade.
-
 # Installation
 
 These scripts expect that the ESPs to be kept synchronized are mounted to directories named /boot@? where the question mark (?) is a single character in the range [a-z] that is unique to each ESP. The distinguishing character could, for example, correlate with the lettering of the corresponding SCSI disk device nodes that the ESPs are stored on (i.e. /dev/sda1 -> /boot@a, /dev/sdb1 -> /boot@b, etc.). Setting up such a correlation is just a recommendation. Only the pattern for the directory name matters. Where the /boot@? directories actually mount from is irrelevant to the scripts.
