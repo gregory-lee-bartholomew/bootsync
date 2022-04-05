@@ -1,6 +1,7 @@
 [Unit]
 Description=bind mount currently-booted ESP to /boot
 ConditionFileIsExecutable=/etc/rc.d/rc.bootbind
+DefaultDependencies=no
 After=local-fs.target
 Before=system-update-pre.target
 
