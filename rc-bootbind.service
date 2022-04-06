@@ -13,4 +13,4 @@ RemainAfterExit=yes
 GuessMainPID=no
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=local-fs.target
