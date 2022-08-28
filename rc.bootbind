@@ -6,12 +6,6 @@ set -e
 shopt -s dotglob
 shopt -s lastpipe
 
-# cleanup /boot symlink from early versions of this script
-if [[ -h /boot ]]; then
-	chmod -x /etc/rc.d/rc.bootlink || true
-	rm -f /boot
-fi
-
 if mountpoint -q /boot; then
 	echo "/boot is already mounted, aborting..." 1>&2
 	exit 1
