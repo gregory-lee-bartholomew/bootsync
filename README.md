@@ -22,12 +22,12 @@ These scripts expect that the ESPs to be kept synchronized are mounted to direct
 
 The /boot@? mountpoints are expected to be available early in the system start up process. This is usually accomplished by listing the mounts in the /etc/fstab system configuration file. For example, your /etc/fstab file might contain lines like the following:
 
-    PARTLABEL=boot@a /boot@a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=rc-bootbind.service,nofail 0 0
-    PARTLABEL=boot@b /boot@b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=rc-bootbind.service,nofail 0 0
+    PARTLABEL=boot@a /boot@a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
+    PARTLABEL=boot@b /boot@b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
 
-**IMPORTANT**: The /etc/fstab entries for the /boot@[a-z] mountpoints *must* list `x-systemd.before=rc-bootbind.service` as a mount option.
+**IMPORTANT**: The /etc/fstab entries for the /boot@[a-z] mountpoints *must* list `x-systemd.before=bootbind.service` as a mount option.
 
-The /boot directory should be empty and unmounted. These scripts will bind-mount /boot to whichever ESP is currently being used on system start up. You can disable the rc-bootbind systemd service and maintain the mount yourself if you wish, but /boot must be a bind mount to one of the /boot@[a-z] mountpoints.
+The /boot directory should be empty and unmounted. These scripts will bind-mount /boot to whichever ESP is currently being used on system start up. You can disable the bootbind systemd service and maintain the mount yourself if you wish, but /boot must be a bind mount to one of the /boot@[a-z] mountpoints.
 
 Once the mountpoints are configured as the scripts expect, the scripts can be copied into place and enabled. A makefile is provide to automate the installation process. To install the scripts and the selinux policy using the makefile, run the following commands while in the root of the git repository:
 
@@ -40,13 +40,13 @@ This software consists of two Bash scripts and two corresponding systemd service
 
 Only paths matching the machine id of the currently booted OS are copied from the current ESP to the secondary ESP(s). This sould be sufficient to synchronize the kernel, initramfs, and BLS loader entries across the ESPs. The currently booted OS's machine id is obtained from /etc/machine-id. The recommended way to synchronize other ESP content is to call `booctl update --esp-path=...` manually when necessary.
 
-The Bash scripts are stored in /etc/rc.d. One is named rc.bootbind. It bind mounts one of the /boot@[a-z] mountpoints onto /boot. The other is named rc.bootsync. It calls rsync after performing a few basic safety checks. The Bash scripts can be run manually with sudo. They do not take any parameters. In fact, I recommend running them manually once right after they are installed to be sure that they are working properly. I also recommend making a backup copy of your ESPs before running them for the first time just to be safe.
+The Bash scripts are stored in /etc/bootsync. One is named `bootbind`. It bind mounts one of the /boot@[a-z] mountpoints onto /boot. The other is named `bootsync`. It calls rsync after performing a few basic safety checks. The Bash scripts can be run manually with sudo. They do not take any parameters. In fact, I recommend running them manually once right after they are installed to be sure that they are working properly. I also recommend making a backup copy of your ESPs before running them for the first time just to be safe.
 
-Note that when calling the rc.bootsync command manually with selinux enabled, it will be running in a different selinux context than it does when called by the systemd startup scripts. Your selinux rules may block running the scripts manually depending on what permissive domains you have configured. You might need to temporarily set the *rsync\_t* domain to permissive mode to run the rc.bootsync command from the command line. Basically, do the following to test rc.bootsync manually with selinux enabled:
+Note that when calling the `bootsync` command manually with selinux enabled, it will be running in a different selinux context than it does when called by the systemd startup scripts. Your selinux rules may block running the scripts manually depending on what permissive domains you have configured. You might need to temporarily set the *rsync\_t* domain to permissive mode to run the `bootsync` command from the command line. Basically, do the following to test `bootsync` manually with selinux enabled:
 
     $ sudo semanage permissive -a rsync_t
-    $ sudo /etc/rc.d/rc.bootbind
-    $ sudo /etc/rc.d/rc.bootsync
+    $ sudo /etc/bootsync/bootbind
+    r sudo /etc/bootsync/bootsync
     $ sudo semanage permissive -d rsync_t
 
 # Final notes

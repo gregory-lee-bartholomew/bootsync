@@ -1,6 +1,6 @@
 [Unit]
 Description=bind mount currently-booted ESP to /boot
-ConditionFileIsExecutable=/etc/rc.d/rc.bootbind
+ConditionFileIsExecutable=/etc/bootsync/bootbind
 DefaultDependencies=no
 Conflicts=shutdown.target
 After=local-fs-pre.target
@@ -8,7 +8,7 @@ Before=local-fs.target shutdown.target
 
 [Service]
 Type=forking
-ExecStart=/etc/rc.d/rc.bootbind
+ExecStart=/etc/bootsync/bootbind
 RemainAfterExit=yes
 GuessMainPID=no
 

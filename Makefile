@@ -1,7 +1,7 @@
-sysv_scripts := $(wildcard rc.*)
-sysv_install := /etc/rc.d
+bsrc_scripts := bootbind bootsync
+bsrc_install := /etc/bootsync
 
-sysd_scripts := $(wildcard rc-*)
+sysd_scripts := $(wildcard *.service)
 sysd_install := /etc/systemd/system
 
 selinuxdevel := /usr/share/selinux/devel
@@ -13,14 +13,18 @@ errormessage := "access denied, (missing sudo?)"
 all :
 	echo "usage: make <install|sepolicy_install|uninstall>"
 
-test : $(sysv_install) $(sysd_install)
-	test -w $(sysv_install) || (echo $(errormessage) 1>&2; exit 1)
+init :
+	test -d $(bsrc_install) || mkdir -v $(bsrc_install) || \
+	(echo $(errormessage) 1>&2; exit 1)
+
+test : $(bsrc_install) $(sysd_install)
+	test -w $(bsrc_install) || (echo $(errormessage) 1>&2; exit 1)
 	test -w $(sysd_install) || (echo $(errormessage) 1>&2; exit 1)
 
-install : test $(sysv_scripts) $(sysd_scripts)
-	for i in $(sysv_scripts); do \
-		cp -vf $$i $(sysv_install)/$$i; \
-		chmod -v +x $(sysv_install)/$$i || true; \
+install : init test $(bsrc_scripts) $(sysd_scripts)
+	for i in $(bsrc_scripts); do \
+		cp -vf $$i $(bsrc_install)/$$i; \
+		chmod -v +x $(bsrc_install)/$$i || true; \
 	done
 	for i in $(sysd_scripts); do cp -vf $$i $(sysd_install)/$$i; done
 	for i in $(sysd_scripts); do systemctl enable $$i; done
@@ -46,7 +50,7 @@ sepolicy_install : sepolicy
 uninstall : test
 	for i in $(sysd_scripts); do systemctl disable $$i || true; done
 	for i in $(sysd_scripts); do rm -vf $(sysd_install)/$$i; done
-	for i in $(sysv_scripts); do rm -vf $(sysv_install)/$$i; done
+	for i in $(bsrc_scripts); do rm -vf $(bsrc_install)/$$i; done
 	semodule -l | grep -w -e bootsync -e bootrmnt | \
 	xargs -r -n 1 semodule -v -r || true
 	semanage fcontext -d $(se_fcontexts) || true
