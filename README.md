@@ -22,8 +22,10 @@ These scripts expect that the ESPs to be kept synchronized are mounted to direct
 
 The /boot@? mountpoints are expected to be available early in the system start up process. This is usually accomplished by listing the mounts in the /etc/fstab system configuration file. For example, your /etc/fstab file might contain lines like the following:
 
-    PARTLABEL=boot@a /boot@a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,nofail 0 0
-    PARTLABEL=boot@b /boot@b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,nofail 0 0
+    PARTLABEL=boot@a /boot@a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=rc-bootbind.service,nofail 0 0
+    PARTLABEL=boot@b /boot@b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=rc-bootbind.service,nofail 0 0
+
+**IMPORTANT**: The /etc/fstab entries for the /boot@[a-z] mountpoints *must* list `x-systemd.before=rc-bootbind.service` as a mount option.
 
 The /boot directory should be empty and unmounted. These scripts will bind-mount /boot to whichever ESP is currently being used on system start up. You can disable the rc-bootbind systemd service and maintain the mount yourself if you wish, but /boot must be a bind mount to one of the /boot@[a-z] mountpoints.
 
