@@ -6,13 +6,13 @@ set -e
 shopt -s dotglob
 shopt -s lastpipe
 
-if mountpoint -q /boot; then
-	echo "/boot is already mounted, aborting..." 1>&2
+if mountpoint -q ${ESP_ROOT}; then
+	echo "${ESP_ROOT} is already mounted, aborting..." 1>&2
 	exit 1
 fi
 
-if ls /boot/* &> /dev/null; then
-	echo "/boot is not empty, aborting..." 1>&2
+if ls ${ESP_ROOT}/* &> /dev/null; then
+	echo "${ESP_ROOT} is not empty, aborting..." 1>&2
 	exit 1
 fi
 
@@ -34,15 +34,15 @@ if [[ -z $UUID ]]; then
 	exit 1
 fi
 
-findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep -m 1 "^/boot@[a-z]$" | read TRGT
+findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep -m 1 "^${ESP_ROOT}@[a-z]$" | read TRGT
 if [[ -z $TRGT ]]; then
-	echo "failed to find mountpoint of form /boot@[a-z] for current esp, aborting..." 1>&2
+	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..." 1>&2
 	exit 1
 fi
 
-mkdir -p /boot
+mkdir -p ${ESP_ROOT}
 
-chmod 0000 /boot &> /dev/null || true
-chcon -u system_u -r object_r -t boot_t -l s0 /boot &> /dev/null || true
+chmod 0000 ${ESP_ROOT} &> /dev/null || true
+chcon -u system_u -r object_r -t boot_t -l s0 ${ESP_ROOT} &> /dev/null || true
 
-mount -o bind $TRGT /boot
+mount -o bind $TRGT ${ESP_ROOT}

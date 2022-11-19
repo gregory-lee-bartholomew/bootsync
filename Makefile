@@ -1,3 +1,5 @@
+esp_root ?= /boot
+
 bsrc_scripts := bootbind bootsync
 bsrc_install := /etc/bootsync
 
@@ -6,7 +8,7 @@ sysd_install := /etc/systemd/system
 
 selinuxdevel := /usr/share/selinux/devel
 sepolicypkgs := bootsync.pp bootrmnt.pp
-se_fcontexts := -t boot_t "/boot@[a-z](/.*)?"
+se_fcontexts := -t boot_t "/$(esp_root)@[a-z](/.*)?"
 
 errormessage := "access denied, (missing sudo?)"
 
@@ -23,10 +25,14 @@ test : $(bsrc_install) $(sysd_install)
 
 install : init test $(bsrc_scripts) $(sysd_scripts)
 	for i in $(bsrc_scripts); do \
-		cp -vf $$i $(bsrc_install)/$$i; \
+		echo Installing $$i...; \
+		ESP_ROOT=$(esp_root) envsubst '$$ESP_ROOT' < $$i > $(bsrc_install)/$$i; \
 		chmod -v +x $(bsrc_install)/$$i || true; \
 	done
-	for i in $(sysd_scripts); do cp -vf $$i $(sysd_install)/$$i; done
+	for i in $(sysd_scripts); do \
+		echo Installing $$i...; \
+		ESP_ROOT=$(esp_root) envsubst '$$ESP_ROOT' < $$i > $(sysd_install)/$$i; \
+	done
 	for i in $(sysd_scripts); do systemctl enable $$i; done
 
 %.pp : %.te
@@ -43,9 +49,9 @@ sepolicy : $(sepolicypkgs)
 sepolicy_install : sepolicy
 	semodule -i $(sepolicypkgs)
 	semanage fcontext -a $(se_fcontexts)
-	umount /boot@[a-z]
-	restorecon -v /boot@[a-z]
-	for i in /boot@[a-z]; do mount --target $$i; done
+	umount $(esp_root)@[a-z]
+	restorecon -v $(esp_root)@[a-z]
+	for i in $(esp_root)@[a-z]; do mount --target $$i; done
 
 uninstall : test
 	for i in $(sysd_scripts); do systemctl disable $$i || true; done
