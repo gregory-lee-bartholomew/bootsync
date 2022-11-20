@@ -1,7 +1,7 @@
 [Unit]
 Description=synchronize ESPs on mirrored-disk systems
 ConditionFileIsExecutable=/etc/bootsync/bootsync
-AssertPathIsMountPoint=/boot
+AssertPathIsMountPoint=${ESP_ROOT}
 After=local-fs.target
 After=bootbind.service
 

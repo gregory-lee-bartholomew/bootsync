@@ -1,5 +1,5 @@
 [Unit]
-Description=bind mount currently-booted ESP to /boot
+Description=bind mount currently-booted ESP to ${ESP_ROOT}
 ConditionFileIsExecutable=/etc/bootsync/bootbind
 DefaultDependencies=no
 Conflicts=shutdown.target
