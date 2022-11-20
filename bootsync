@@ -15,7 +15,6 @@ if ! [[ -d ${ESP_ROOT}/loader ]]; then
 	exit 1
 fi
 
-
 if ! read MACHINE_ID < /etc/machine-id; then
 	echo "file /etc/machine-id is empty, aborting..." 1>&2
 	exit 1
@@ -49,7 +48,6 @@ for m in $(ls -d ${ESP_ROOT}@[a-z]); do
 		(echo "$LASTKRN"; echo "$LASTESP") | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
 			echo "newer kernel detected on $m, refusing to update..." 1>&2
-			rm $TEMPDIR/$LASTESP
 			continue
 		fi
 	fi
