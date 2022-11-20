@@ -50,7 +50,7 @@ for m in $(ls -d ${ESP_ROOT}@[a-z]); do
 	mountpoint -q $m || continue
 	[[ $m == $TGT ]] && continue
 
-	ls -v $m/$MACHINE_ID | tail -n 1 | read LASTESP
+	ls -v $m/$MACHINE_ID | tail -n 1 | read LASTESP || :
 	touch $TEMPDIR/$LASTESP
 	ls -v $TEMPDIR | tail -n 1 | read TESTKRN
 	if [[ $TESTKRN != $LASTKRN ]]; then
