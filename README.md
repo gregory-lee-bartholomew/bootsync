@@ -12,7 +12,7 @@ Keep ESPs synchronized on mirrored-disk systems
 - systemd
 - efibootmgr
 - rsync
-- coreutils (ln, mktemp)
+- coreutils
 - util-linux (mountpoint, findmnt)
 - selinux-policy-devel (needed by 'sepolicy\_install')
 - gettext (envsubst - needed by 'install')
@@ -48,14 +48,10 @@ This software consists of two Bash scripts and two corresponding systemd service
 
 Only paths matching the machine id of the currently booted OS are copied from the current ESP to the secondary ESP(s). This sould be sufficient to synchronize the kernel, initramfs, and BLS loader entries across the ESPs. The currently booted OS's machine id is obtained from /etc/machine-id. The recommended way to synchronize other ESP content is to call `booctl update --esp-path=...` manually when necessary.
 
-The Bash scripts are stored in /etc/bootsync. One is named `bootbind`. It bind mounts one of the ESP_ROOT@[a-z] mountpoints onto ESP_ROOT. The other is named `bootsync`. It calls rsync after performing a few basic safety checks. The Bash scripts can be run manually with sudo. They do not take any parameters. In fact, I recommend running them manually once right after they are installed to be sure that they are working properly. I also recommend making a backup copy of your ESPs before running them for the first time just to be safe.
+The Bash scripts are stored in /etc/bootsync. One is named `bootbind`. It bind mounts one of the ESP_ROOT@[a-z] mountpoints onto ESP_ROOT. The other is named `bootsync`. It calls rsync after performing a few basic safety checks. The Bash scripts can be run manually with sudo. They do not take any parameters. In fact, I recommend running them manually once right after they are installed to be sure that they are working properly. I also recommend making a backup copy of your ESPs before running them for the first time just to be safe. For example, you could run the following commands to manually test the bootsync scripts.
 
-Note that when calling the `bootsync` command manually with selinux enabled, it will be running in a different selinux context than it does when called by the systemd startup scripts. Your selinux rules may block running the scripts manually depending on what permissive domains you have configured. You might need to temporarily set the *rsync\_t* domain to permissive mode to run the `bootsync` command from the command line. Basically, do the following to test `bootsync` manually with selinux enabled:
-
-    $ sudo semanage permissive -a rsync_t
     $ sudo /etc/bootsync/bootbind
-    r sudo /etc/bootsync/bootsync
-    $ sudo semanage permissive -d rsync_t
+    $ sudo /etc/bootsync/bootsync
 
 # Final notes
 
