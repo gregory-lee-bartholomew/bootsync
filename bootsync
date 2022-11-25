@@ -1,11 +1,9 @@
 #!/usr/bin/bash
 # vim:set ts=3:
 
-set -e
-
 shopt -s lastpipe
 
-if ! mountpoint -q ${ESP_ROOT}; then
+if ! mountpoint -q "${ESP_ROOT}"; then
 	echo "${ESP_ROOT} is not a mountpoint, aborting..." 1>&2
 	exit 1
 fi
@@ -20,14 +18,18 @@ if ! read MACHINE_ID < /etc/machine-id; then
 	exit 1
 fi
 
-ls -v -r /lib/modules | read LASTKRN
+if ! ls -v -r /lib/modules | read LASTKRN; then
+	echo "failed to determine latest kernel version, aborting ..." 1>&2
+	exit 1
+fi
+
 if ! [[ -e ${ESP_ROOT}/$MACHINE_ID/$LASTKRN ]]; then
 	echo "$MACHINE_ID/$LASTKRN not found under ${ESP_ROOT}, aborting..." 1>&2
 	exit 1
 fi
 
-findmnt -n -l --output source ${ESP_ROOT} | read SRC
-findmnt -n -l --output target $SRC | grep -m 1 "^${ESP_ROOT}@[a-z]$" | read TGT
+findmnt -n -l --output source "${ESP_ROOT}" | read SRC
+findmnt -n -l --output target "$SRC" | grep -m 1 "^${ESP_ROOT}@[a-z]$" | read TGT
 if [[ -z $TGT ]]; then
 	echo "${ESP_ROOT} does not appear to be a bind mount of ${ESP_ROOT}@[a-z], aborting..." 1>&2
 	exit 1
@@ -40,11 +42,11 @@ else
 fi
 
 for m in $(ls -d ${ESP_ROOT}@[a-z]); do
-	mountpoint -q $m || continue
+	mountpoint -q "$m" || continue
 	[[ $m == $TGT ]] && continue
 
 	if [[ -d $m/$MACHINE_ID ]]; then
-		ls -v -r $m/$MACHINE_ID | read LASTESP || :
+		ls -v -r "$m/$MACHINE_ID" | read LASTESP
 		(echo "$LASTKRN"; echo "$LASTESP") | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
 			echo "newer kernel detected on $m, refusing to update..." 1>&2
@@ -52,5 +54,5 @@ for m in $(ls -d ${ESP_ROOT}@[a-z]); do
 		fi
 	fi
 
-	rsync $VERBOSITY -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" ${ESP_ROOT}/ $m
+	rsync "$VERBOSITY" -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" "${ESP_ROOT}/" "$m"
 done
