@@ -38,10 +38,5 @@ if [[ -z $TRGT ]]; then
 	exit 1
 fi
 
-mkdir -p ${ESP_ROOT}
-
-chmod 0000 ${ESP_ROOT} &> /dev/null || true
-chcon -u system_u -r object_r -t boot_t -l s0 ${ESP_ROOT} &> /dev/null || true
-
 mount -o bind $TRGT ${ESP_ROOT}
 exit $?
