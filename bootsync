@@ -41,7 +41,7 @@ else
 	VERBOSITY='-q'
 fi
 
-for m in $(ls -d ${ESP_ROOT}@[a-z]); do
+for m in ${ESP_ROOT}@[a-z]; do
 	mountpoint -q "$m" || continue
 	[[ $m == $TGT ]] && continue
 
