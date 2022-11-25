@@ -1,8 +1,6 @@
 #!/usr/bin/bash
 # vim:set ts=3:
 
-set -e
-
 shopt -s dotglob
 shopt -s lastpipe
 
@@ -46,3 +44,4 @@ chmod 0000 ${ESP_ROOT} &> /dev/null || true
 chcon -u system_u -r object_r -t boot_t -l s0 ${ESP_ROOT} &> /dev/null || true
 
 mount -o bind $TRGT ${ESP_ROOT}
+exit $?
