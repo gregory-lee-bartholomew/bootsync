@@ -51,6 +51,7 @@ for m in ${ESP_ROOT}@[a-z]; do
 		printf "$LASTKRN\n$LASTESP\n" | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
 			echo "newer kernel detected on $m, refusing to update..." 1>&2
+			RETURN=1
 			continue
 		fi
 	fi
