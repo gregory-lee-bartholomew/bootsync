@@ -4,7 +4,7 @@
 shopt -s dotglob
 shopt -s lastpipe
 
-if mountpoint -q ${ESP_ROOT}; then
+if mountpoint -q "${ESP_ROOT}"; then
 	echo "${ESP_ROOT} is already mounted, aborting..." 1>&2
 	exit 1
 fi
@@ -38,5 +38,5 @@ if [[ -z $TRGT ]]; then
 	exit 1
 fi
 
-mount -o bind $TRGT ${ESP_ROOT}
+mount -o bind "$TRGT" "${ESP_ROOT}"
 exit $?
