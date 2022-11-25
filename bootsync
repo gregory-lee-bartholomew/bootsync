@@ -41,6 +41,7 @@ else
 	VERBOSITY='-q'
 fi
 
+RETURN=0
 for m in ${ESP_ROOT}@[a-z]; do
 	mountpoint -q "$m" || continue
 	[[ $m == $TGT ]] && continue
@@ -55,4 +56,7 @@ for m in ${ESP_ROOT}@[a-z]; do
 	fi
 
 	rsync "$VERBOSITY" -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" "${ESP_ROOT}/" "$m"
+	RETURN=$(($RETURN || $?))
 done
+
+exit $RETURN
