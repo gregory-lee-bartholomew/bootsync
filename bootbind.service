@@ -7,10 +7,9 @@ After=local-fs-pre.target
 Before=local-fs.target shutdown.target
 
 [Service]
-Type=forking
+Type=oneshot
 ExecStart=/etc/bootsync/bootbind
 RemainAfterExit=yes
-GuessMainPID=no
 
 [Install]
 WantedBy=local-fs.target
