@@ -47,7 +47,7 @@ for m in $(ls -d ${ESP_ROOT}@[a-z]); do
 
 	if [[ -d $m/$MACHINE_ID ]]; then
 		ls -v -r "$m/$MACHINE_ID" | read LASTESP
-		(echo "$LASTKRN"; echo "$LASTESP") | sort -V -r | read GREATER
+		printf "$LASTKRN\n$LASTESP\n" | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
 			echo "newer kernel detected on $m, refusing to update..." 1>&2
 			continue
