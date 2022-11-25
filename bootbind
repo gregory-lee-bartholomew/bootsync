@@ -20,13 +20,13 @@ if [[ -z $DATA ]]; then
 	exit 1
 fi
 
-echo "$DATA" | grep "^BootCurrent: " | read BOOT
-if [[ -z $BOOT ]]; then
+echo "$DATA" | grep "^BootCurrent: " | read LABEL BOOT_ID
+if [[ -z $BOOT_ID ]]; then
 	echo "failed to determine current esp, aborting..." 1>&2
 	exit 1
 fi
 
-echo "$DATA" | grep "^Boot${BOOT#BootCurrent: }" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
+echo "$DATA" | grep "^Boot$BOOT_ID" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
 if [[ -z $UUID ]]; then
 	echo "failed to find current esp's partition uuid, aborting..." 1>&2
 	exit 1
