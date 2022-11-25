@@ -32,7 +32,7 @@ if [[ -z $UUID ]]; then
 	exit 1
 fi
 
-findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep -m 1 "^${ESP_ROOT}@[a-z]$" | read TRGT
+findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep "^${ESP_ROOT}@[a-z]$" | read TRGT
 if [[ -z $TRGT ]]; then
 	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..." 1>&2
 	exit 1
