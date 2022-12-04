@@ -28,10 +28,10 @@ if ! [[ -e ${ESP_ROOT}/$MACHINE_ID/$LASTKRN ]]; then
 	exit 1
 fi
 
-findmnt -n -l --output source "${ESP_ROOT}" | read SRC
-findmnt -n -l --output target "$SRC" | grep "^${ESP_ROOT}@[a-z]$" | read TGT
-if [[ -z $TGT ]]; then
-	echo "${ESP_ROOT} does not appear to be a bind mount of ${ESP_ROOT}@[a-z], aborting..." 1>&2
+findmnt -n -l --output source "${ESP_ROOT}" | read ESP_SOURCE
+ESP_TARGETS=($(findmnt -n -l --output target "$ESP_SOURCE" | grep "^${ESP_ROOT}@[a-z]$"))
+if [[ ${#ESP_TARGETS[@]} -ne 1 ]]; then
+	echo "${ESP_ROOT} does not appear to be a bind mount of exactly one ${ESP_ROOT}@[a-z] path, aborting..." 1>&2
 	exit 1
 fi
 
@@ -44,7 +44,7 @@ fi
 RETURN=0
 for m in ${ESP_ROOT}@[a-z]; do
 	mountpoint -q "$m" || continue
-	[[ $m == $TGT ]] && continue
+	[[ $m == ${ESP_TARGETS[0]} ]] && continue
 
 	if [[ -d $m/$MACHINE_ID ]]; then
 		ls -v -r "$m/$MACHINE_ID" | read LASTESP
