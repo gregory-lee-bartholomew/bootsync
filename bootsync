@@ -42,21 +42,21 @@ else
 fi
 
 RETURN=0
-for m in ${ESP_ROOT}@[a-z]; do
-	mountpoint -q "$m" || continue
-	[[ $m == ${ESP_TARGETS[0]} ]] && continue
+for esp in ${ESP_ROOT}@[a-z]; do
+	mountpoint -q "$esp" || continue
+	[[ $esp == ${ESP_TARGETS[0]} ]] && continue
 
-	if [[ -d $m/$MACHINE_ID ]]; then
-		ls -v -r "$m/$MACHINE_ID" | read LASTESP
+	if [[ -d $esp/$MACHINE_ID ]]; then
+		ls -v -r "$esp/$MACHINE_ID" | read LASTESP
 		printf "$LASTKRN\n$LASTESP\n" | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
-			echo "newer kernel detected on $m, refusing to update..." 1>&2
+			echo "newer kernel detected on $esp, refusing to update..." 1>&2
 			RETURN=1
 			continue
 		fi
 	fi
 
-	rsync "$VERBOSITY" -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" "${ESP_ROOT}/" "$m"
+	rsync "$VERBOSITY" -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" "${ESP_ROOT}/" "$esp"
 	RETURN=$(($RETURN || $?))
 done
 
