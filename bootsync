@@ -29,7 +29,7 @@ if ! [[ -e ${ESP_ROOT}/$MACHINE_ID/$LASTKRN ]]; then
 fi
 
 findmnt -n -l --output source "${ESP_ROOT}" | read ESP_SOURCE
-ESP_TARGETS=($(findmnt -n -l --output target "$ESP_SOURCE" | grep "^${ESP_ROOT}@[a-z]$"))
+findmnt -n -l --output target "$ESP_SOURCE" | grep "^${ESP_ROOT}@[a-z]$" | readarray -t ESP_TARGETS
 if [[ ${#ESP_TARGETS[@]} -ne 1 ]]; then
 	echo "${ESP_ROOT} does not appear to be a bind mount of exactly one ${ESP_ROOT}@[a-z] path, aborting..." 1>&2
 	exit 1
