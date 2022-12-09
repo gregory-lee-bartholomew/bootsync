@@ -14,29 +14,29 @@ if ls ${ESP_ROOT}/* &> /dev/null; then
 	exit 1
 fi
 
-DATA="$(efibootmgr -v)"
-if [[ -z $DATA ]]; then
+EFI_VARS="$(efibootmgr -v)"
+if [[ -z $EFI_VARS ]]; then
 	echo "failed to read efi variables, aborting..." 1>&2
 	exit 1
 fi
 
-echo "$DATA" | grep "^BootCurrent: " | read LABEL BOOT_ID
+echo "$EFI_VARS" | grep "^BootCurrent: " | read LABEL BOOT_ID
 if [[ -z $BOOT_ID ]]; then
 	echo "failed to determine current esp, aborting..." 1>&2
 	exit 1
 fi
 
-echo "$DATA" | grep "^Boot$BOOT_ID" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
+echo "$EFI_VARS" | grep "^Boot$BOOT_ID" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
 if [[ -z $UUID ]]; then
 	echo "failed to find current esp's partition uuid, aborting..." 1>&2
 	exit 1
 fi
 
-findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep "^${ESP_ROOT}@[a-z]$" | read TRGT
-if [[ -z $TRGT ]]; then
+findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
+if [[ -z $ESP_MOUNT ]]; then
 	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..." 1>&2
 	exit 1
 fi
 
-mount -o bind "$TRGT" "${ESP_ROOT}"
+mount -o bind "$ESP_MOUNT" "${ESP_ROOT}"
 exit $?
