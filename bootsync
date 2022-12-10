@@ -1,37 +1,39 @@
 #!/usr/bin/bash
 # vim:set ts=3:
 
+exec 1>&2
+
 shopt -s lastpipe
 
 if ! mountpoint -q "${ESP_ROOT}"; then
-	echo "${ESP_ROOT} is not a mountpoint, aborting..." 1>&2
+	echo "${ESP_ROOT} is not a mountpoint, aborting..."
 	exit 1
 fi
 
 if ! [[ -d ${ESP_ROOT}/loader ]]; then
-	echo "directory ${ESP_ROOT}/loader not found, aborting..." 1>&2
+	echo "directory ${ESP_ROOT}/loader not found, aborting..."
 	exit 1
 fi
 
 if ! read MACHINE_ID < /etc/machine-id; then
-	echo "file /etc/machine-id is empty, aborting..." 1>&2
+	echo "file /etc/machine-id is empty, aborting..."
 	exit 1
 fi
 
 if ! ls -v -r /lib/modules | read LASTKRN; then
-	echo "failed to determine latest kernel version, aborting ..." 1>&2
+	echo "failed to determine latest kernel version, aborting ..."
 	exit 1
 fi
 
 if ! [[ -e ${ESP_ROOT}/$MACHINE_ID/$LASTKRN ]]; then
-	echo "$MACHINE_ID/$LASTKRN not found under ${ESP_ROOT}, aborting..." 1>&2
+	echo "$MACHINE_ID/$LASTKRN not found under ${ESP_ROOT}, aborting..."
 	exit 1
 fi
 
 findmnt -n -l --output "source" "${ESP_ROOT}" | read ESP_DEVICE
 findmnt -n -l --output "target" "$ESP_DEVICE" | grep "^${ESP_ROOT}@[a-z]$" | readarray -t ESP_MOUNT
 if [[ ${#ESP_MOUNT[@]} -ne 1 ]]; then
-	echo "${ESP_ROOT} does not appear to be a bind mount of exactly one ${ESP_ROOT}@[a-z] path, aborting..." 1>&2
+	echo "${ESP_ROOT} does not appear to be a bind mount of exactly one ${ESP_ROOT}@[a-z] path, aborting..."
 	exit 1
 fi
 
@@ -50,7 +52,7 @@ for esp in ${ESP_ROOT}@[a-z]; do
 		ls -v -r "$esp/$MACHINE_ID" | read LASTESP
 		printf "$LASTKRN\n$LASTESP\n" | sort -V -r | read GREATER
 		if [[ $GREATER != $LASTKRN ]]; then
-			echo "newer kernel detected on $esp, refusing to update..." 1>&2
+			echo "newer kernel detected on $esp, refusing to update..."
 			RETURN=1
 			continue
 		fi

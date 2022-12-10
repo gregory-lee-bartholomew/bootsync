@@ -1,40 +1,42 @@
 #!/usr/bin/bash
 # vim:set ts=3:
 
+exec 1>&2
+
 shopt -s dotglob
 shopt -s lastpipe
 
 if mountpoint -q "${ESP_ROOT}"; then
-	echo "${ESP_ROOT} is already mounted, aborting..." 1>&2
+	echo "${ESP_ROOT} is already mounted, aborting..."
 	exit 1
 fi
 
 if ls ${ESP_ROOT}/* &> /dev/null; then
-	echo "${ESP_ROOT} is not empty, aborting..." 1>&2
+	echo "${ESP_ROOT} is not empty, aborting..."
 	exit 1
 fi
 
 EFI_VARS="$(efibootmgr -v)"
 if [[ -z $EFI_VARS ]]; then
-	echo "failed to read efi variables, aborting..." 1>&2
+	echo "failed to read efi variables, aborting..."
 	exit 1
 fi
 
 echo "$EFI_VARS" | grep "^BootCurrent: " | read LABEL BOOT_ID
 if [[ -z $BOOT_ID ]]; then
-	echo "failed to determine current esp, aborting..." 1>&2
+	echo "failed to determine current esp, aborting..."
 	exit 1
 fi
 
 echo "$EFI_VARS" | grep "^Boot$BOOT_ID" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
 if [[ -z $UUID ]]; then
-	echo "failed to find current esp's partition uuid, aborting..." 1>&2
+	echo "failed to find current esp's partition uuid, aborting..."
 	exit 1
 fi
 
 findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
 if [[ -z $ESP_MOUNT ]]; then
-	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..." 1>&2
+	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..."
 	exit 1
 fi
 
