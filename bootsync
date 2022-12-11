@@ -31,9 +31,11 @@ if ! [[ -e ${ESP_ROOT}/$MACHINE_ID/$LASTKRN ]]; then
 fi
 
 findmnt -n -l --output "source" "${ESP_ROOT}" | read ESP_DEVICE
-findmnt -n -l --output "target" "$ESP_DEVICE" | grep "^${ESP_ROOT}@[a-z]$" | readarray -t ESP_MOUNT
+findmnt -n -l --output "target" "$ESP_DEVICE" \
+	| grep "^${ESP_ROOT}@[a-z]$" | readarray -t ESP_MOUNT
 if [[ ${#ESP_MOUNT[@]} -ne 1 ]]; then
-	echo "${ESP_ROOT} does not appear to be a bind mount of exactly one ${ESP_ROOT}@[a-z] path, aborting..."
+	echo -n "${ESP_ROOT} does not appear to be a bind mount "
+	echo "of exactly one ${ESP_ROOT}@[a-z] path, aborting..."
 	exit 1
 fi
 
@@ -58,7 +60,14 @@ for esp in ${ESP_ROOT}@[a-z]; do
 		fi
 	fi
 
-	rsync "$VERBOSITY" -r --delete --include="*/" --include="**$MACHINE_ID**" --exclude="*" "${ESP_ROOT}/" "$esp"
+	rsync "$VERBOSITY" \
+		-r \
+		--delete \
+		--include="*/" \
+		--include="**$MACHINE_ID**" \
+		--exclude="*" \
+		"${ESP_ROOT}/" "$esp"
+
 	RETURN=$(($RETURN || $?))
 done
 

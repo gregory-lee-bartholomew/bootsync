@@ -28,15 +28,18 @@ if [[ -z $BOOT_ID ]]; then
 	exit 1
 fi
 
-echo "$EFI_VARS" | grep "^Boot$BOOT_ID" | grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
+echo "$EFI_VARS" | grep "^Boot$BOOT_ID" \
+	| grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
 if [[ -z $UUID ]]; then
 	echo "failed to find current esp's partition uuid, aborting..."
 	exit 1
 fi
 
-findmnt -n -l --source "PARTUUID=$UUID" --output "target" | grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
+findmnt -n -l --source "PARTUUID=$UUID" --output "target" \
+	| grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
 if [[ -z $ESP_MOUNT ]]; then
-	echo "failed to find mountpoint of form ${ESP_ROOT}@[a-z] for current esp, aborting..."
+	echo -n "failed to find mountpoint of form ${ESP_ROOT}@[a-z] "
+	echo "for current esp, aborting..."
 	exit 1
 fi
 
