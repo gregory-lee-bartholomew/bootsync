@@ -16,24 +16,10 @@ if ls ${ESP_ROOT}/* &> /dev/null; then
 	exit 1
 fi
 
-EFI_VARS="$(efibootmgr -v)"
-if [[ -z $EFI_VARS ]]; then
-	echo "failed to read efi variables, aborting..."
-	exit 1
-fi
-
-echo "$EFI_VARS" | grep "^BootCurrent: " | read LABEL BOOT_ID
-if [[ -z $BOOT_ID ]]; then
-	echo "failed to determine current esp, aborting..."
-	exit 1
-fi
-
-echo "$EFI_VARS" | grep "^Boot$BOOT_ID" \
-	| grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
-if [[ -z $UUID ]]; then
-	echo "failed to find current esp's partition uuid, aborting..."
-	exit 1
-fi
+# get the UUID of the ESP that sd-boot was loaded from when the system booted
+# skip the first four bytes as they are not part of the UUID data
+# translate uppercase to lowercase because findmnt matches case-sensitively
+UUID=$(dd if=/sys/firmware/efi/efivars/LoaderDevicePartUUID-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f bs=1 skip=4 conv=lcase status=none | tr -d \\000)
 
 findmnt -n -l --source "PARTUUID=$UUID" --output "target" \
 	| grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
