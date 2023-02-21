@@ -10,7 +10,6 @@ Keep ESPs synchronized on mirrored-disk systems
 
 - bash
 - systemd
-- efibootmgr
 - rsync
 - coreutils
 - util-linux (mountpoint, findmnt)
