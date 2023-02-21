@@ -34,8 +34,8 @@ findmnt -n -l --output "source" "${ESP_ROOT}" | read ESP_DEVICE
 findmnt -n -l --output "target" "$ESP_DEVICE" \
 	| grep "^${ESP_ROOT}@[a-z]$" | readarray -t ESP_MOUNT
 if [[ ${#ESP_MOUNT[@]} -ne 1 ]]; then
-	echo -n "${ESP_ROOT} does not appear to be a bind mount "
-	echo "of exactly one ${ESP_ROOT}@[a-z] path, aborting..."
+	echo "${ESP_ROOT} does not appear to be a bind mount" \
+		"of exactly one ${ESP_ROOT}@[a-z] path, aborting..."
 	exit 1
 fi
 
