@@ -9,7 +9,7 @@ sysd_scripts := $(wildcard *.service)
 sysd_install := /etc/systemd/system
 
 selinuxdevel := /usr/share/selinux/devel
-sepolicypkgs := bootsync.pp bootrmnt.pp
+sepolicypkgs := bootsync.pp
 se_fcontexts := -t boot_t "/$(esp_root)@[a-z](/.*)?"
 
 errormessage := "access denied, (missing sudo?)"
