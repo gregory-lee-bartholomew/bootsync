@@ -32,6 +32,11 @@ done
 dd if="$EFIVARS/$LDPUVAR" bs=1 skip=4 conv=lcase status=none | tr -d \\000 \
 	| read UUID
 
+if [[ -z $UUID ]]; then
+	echo "failed to read ESP UUID from EFI, aborting..."
+	exit 1
+fi
+
 findmnt -n -l --source "PARTUUID=$UUID" --output "target" \
 	| grep "^${ESP_ROOT}@[a-z]$" | read ESP_MOUNT
 if [[ -z $ESP_MOUNT ]]; then
