@@ -21,7 +21,7 @@ TIMEOUT=10
 EFIVARS='/sys/firmware/efi/efivars'
 LDPUVAR='LoaderDevicePartUUID-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f'
 while [[ $TIME -lt $TIMEOUT ]]; do
-	if [[ -e $EFIVARS/$LDPUVAR ]]; then break; fi
+	[[ -e $EFIVARS/$LDPUVAR ]] && break
 	sleep 1
 	TIME=$(($TIME+1))
 done
@@ -29,7 +29,7 @@ done
 # get the UUID of the ESP that sd-boot was loaded from when the system booted
 # skip the first four bytes as they are not part of the UUID data
 # translate uppercase to lowercase because findmnt matches case-sensitively
-dd if="$EFIVARS/$LDPUVAR" bs=1 skip=4 conv=lcase status=none | tr -d \\000 \
+dd if="$EFIVARS/$LDPUVAR" bs=1 skip=4 conv=lcase status=none | tr -d '\000' \
 	| read UUID
 
 if [[ -z $UUID ]]; then
