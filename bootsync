@@ -47,8 +47,13 @@ fi
 
 RETURN=0
 for esp in ${ESP_ROOT}@[a-z]; do
-	mountpoint -q "$esp" || continue
 	[[ $esp == ${ESP_MOUNT[0]} ]] && continue
+
+	if ! mountpoint -q "$esp"; then
+		echo "mountpoint $esp not mounted, skipping..."
+		RETURN=1
+		continue
+	fi
 
 	if [[ -d $esp/$MACHINE_ID ]]; then
 		ls -v -r "$esp/$MACHINE_ID" | read LASTESP
