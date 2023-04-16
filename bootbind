@@ -32,6 +32,18 @@ done
 dd if="$EFIVARS/$LDPUVAR" bs=1 skip=4 conv=lcase status=none | tr -d '\000' \
 	| read UUID
 
+# fallback to using efibootmgr
+if [[ -z $UUID ]]; then
+	echo "failed to read LoaderDevicePartUUID, retrying with efibootmgr..."
+
+	EFI_VARS="$(efibootmgr -v)"
+
+	[[ -n $EFI_VARS ]] && echo "$EFI_VARS" | grep "^BootCurrent: " \
+		| read LABEL BOOT_ID
+	[[ -n $BOOT_ID ]] && echo "$EFI_VARS" | grep "^Boot$BOOT_ID" \
+		| grep --perl-regexp -io '[0-9a-f-]{36}' | read UUID
+fi
+
 if [[ -z $UUID ]]; then
 	echo "failed to read ESP UUID from EFI, aborting..."
 	exit 1
