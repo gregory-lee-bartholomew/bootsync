@@ -54,7 +54,7 @@ The Bash scripts are stored in /etc/bootsync. One is named `bootbind`. It bind m
 
 # Final notes
 
-I use these scripts on Fedora systems (Workstation edition, not Silverblue) where I have my ESPs mounted to /boot@{a,b} and these partitions contain both the bootloader ([systemd-boot](https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/)) and the kernel+initramfs. This configuration is recommended by the [Boot Loader Specification](https://systemd.io/BOOT_LOADER_SPECIFICATION/) which is part of the systemd project.
+I use these scripts on Fedora systems (Workstation edition, not Silverblue) where I have my ESPs mounted to /boot@{a,b} and these partitions contain both the bootloader ([systemd-boot](https://www.freedesktop.org/wiki/Software/systemd/systemd-boot/)) and the kernel+initramfs. This configuration is recommended by the [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) which is part of the systemd project.
 
 The GRUB bootloader is known to have problems with this configuration because it attempts to put a symlink below /boot. I have not tested these scripts with GRUB and I do not expect that they will work (properly) with GRUB. Feel free to try and get this to work with GRUB if you like, but my personal recommendation is to switch to using systemd-boot if possible. Please do not send pull requests to integrate GRUB compatibility features. I want to keep these scripts as simple as possible (no GRUB hacks please).
 
