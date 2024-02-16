@@ -10,7 +10,7 @@ sysd_install := /etc/systemd/system
 
 selinuxdevel := /usr/share/selinux/devel
 sepolicypkgs := bootsync.pp
-se_fcontexts := -t boot_t "/$(esp_root)@[a-z](/.*)?"
+se_fcontexts := -t boot_t "$(esp_root)@[a-z](/.*)?"
 
 errormessage := "access denied, (missing sudo?)"
 
