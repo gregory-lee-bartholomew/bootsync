@@ -8,7 +8,7 @@ bsrc_install := /etc/bootsync
 sysd_scripts := $(wildcard *.service)
 sysd_install := /etc/systemd/system
 
-selinuxdevel := /usr/share/selinux/devel
+selinuxdevel := /usr/share/selinux/devel/Makefile
 sepolicypkgs := bootsync.pp
 se_fcontexts := -t boot_t "$(esp_root)@[a-z](/.*)?"
 
@@ -45,7 +45,7 @@ install : init test $(bsrc_scripts) $(sysd_scripts)
 	tmpdir=`mktemp -d`; \
 		trap 'rm -rf "$$tmpdir"' exit; \
 		cp $< $$tmpdir; \
-		$(MAKE) -C $$tmpdir -f $(selinuxdevel)/Makefile $@; \
+		$(MAKE) -C $$tmpdir -f $(selinuxdevel) $@; \
 		cp $$tmpdir/$@ .
 
 sepolicy : $(sepolicypkgs)
