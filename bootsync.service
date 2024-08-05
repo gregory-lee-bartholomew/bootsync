@@ -5,9 +5,8 @@ After=local-fs.target
 After=bootbind.service
 
 [Service]
-Type=oneshot
 ExecStart=/etc/bootsync/bootsync
-RemainAfterExit=yes
+RestartForceExitStatus=2
 
 [Install]
 WantedBy=multi-user.target

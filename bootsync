@@ -51,7 +51,7 @@ for esp in ${ESP_ROOT}@[a-z]; do
 
 	if ! mountpoint -q "$esp"; then
 		echo "mountpoint $esp not mounted, skipping..."
-		RETURN=1
+		RETURN=2 # exit code 2 should trigger a retry
 		continue
 	fi
 
