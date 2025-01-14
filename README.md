@@ -24,8 +24,8 @@ These scripts expect that the ESPs to be kept synchronized are mounted to direct
 
 The ESP_ROOT@? mountpoints are expected to be available early in the system start up process. This is usually accomplished by listing the mounts in the /etc/fstab system configuration file. For example, your /etc/fstab file might contain lines like the following:
 
-    PARTLABEL=boot@a ESP_ROOT@a vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
-    PARTLABEL=boot@b ESP_ROOT@b vfat umask=0077,shortname=lower,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
+    PARTLABEL=boot@a ESP_ROOT@a vfat shortname=lower,dmask=0077,fmask=0177,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
+    PARTLABEL=boot@b ESP_ROOT@b vfat shortname=lower,dmask=0077,fmask=0177,context=system_u:object_r:boot_t:s0,x-systemd.before=bootbind.service,nofail 0 0
 
 **IMPORTANT**: The /etc/fstab entries for the ESP_ROOT@[a-z] mountpoints *must* list `x-systemd.before=bootbind.service` as a mount option.
 
