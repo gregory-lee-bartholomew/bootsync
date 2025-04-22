@@ -53,9 +53,9 @@ sepolicy : $(sepolicypkgs)
 sepolicy_install : sepolicy
 	semodule -i $(sepolicypkgs)
 	semanage fcontext -a $(se_fcontexts)
-	umount $(esp_root)@[a-z]
+	umount $(esp_root)@[a-z] || true
 	restorecon -v $(esp_root)@[a-z]
-	for i in $(esp_root)@[a-z]; do mount --target $$i; done
+	for i in $(esp_root)@[a-z]; do mount --target $$i; done || true
 
 uninstall : test
 	for i in $(sysd_scripts); do systemctl disable $$i || true; done
